@@ -13,7 +13,7 @@ class EventController extends Controller
         $events = Event::orderBy("created_at", "desc")->get();
 
         return response([
-            "message" => "Events fetched successfully", "events" => $events,
+            "message" => "Events fetched successfully", "events" => $events->load('category', 'venue', 'organizer', 'tickets', 'faqs'),
         ], 200);
     }
 
@@ -164,9 +164,8 @@ class EventController extends Controller
                 $imagePath = $this->saveImage($photo, 'events');
                 $imagePaths[] = $imagePath;
             }
-
             $event->update([
-                "photo" => $imagePaths,
+                "photos" => $imagePaths,
             ]);
         }
         return response([

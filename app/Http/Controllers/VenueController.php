@@ -13,7 +13,7 @@ class VenueController extends Controller
         $venues = Venue::latest()->get();
         return response([
             'message' => 'Venues fetched successfully',
-            "venues" => $venues
+            "venues" => $venues->load('owner', 'events'),
         ], 200);
     }
 
