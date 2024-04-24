@@ -19,11 +19,12 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
         ]);
-
+        // dd($request->all());
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $request->role,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -41,7 +42,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('email', 'password', 'role');
 
         if (!Auth::attempt($credentials)) {
             return response([
@@ -51,11 +52,36 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
+        if ($request->role === 'venue_owner' && $user->role != 'venue_owner') {
+            return response([
+                'message' => 'Invalid login details',
+            ], 401); // 401 Unauthorized status code
+        }
+
+        if ($request->role === 'event_organizer' && $user->role != 'event_organizer') {
+            return response([
+                'message' => 'Invalid login details',
+            ], 401); // 401 Unauthorized status code
+        }
+
+        if ($request->role === 'admin' && $user->role != 'admin') {
+            return response([
+                'message' => 'Invalid login details',
+            ], 401); // 401 Unauthorized status code
+        }
+
+        if ($request->role === 'attendee' && $user->role != 'attendee') {
+            return response([
+                'message' => 'Invalid login details',
+            ], 401); // 401 Unauthorized status code
+        }
+
         return response([
             'user' => $user,
             'token' => $user->createToken('auth_token')->plainTextToken,
         ], 200); // 200 OK status code
     }
+
 
     public function logout()
     {
@@ -94,8 +120,8 @@ class AuthController extends Controller
         //     'dob' => 'required',
         //     'username' => 'required',
         // ]);
-
-
+            
+        // dd($request->all());
         $user = Auth::user();
         $user->update($request->only('gender', 'role',  'phone', 'dob', 'username'));
 

@@ -23,6 +23,10 @@ class TicketController extends Controller
             "name" => "required",
             "description" => "required",
             "event_id" => "required",
+            "quantity" => "numeric||nullable",
+            "price" => "required||nullable",
+            "sales_start" => "required||nullable",
+            "sales_end" => "required||nullable",
         ]);
 
         $user = Auth::user();
@@ -32,7 +36,7 @@ class TicketController extends Controller
                 'message' => 'No event organizer found',
             ]);
         }
-
+        // dd($request->all());
         $ticket = Ticket::create([
             "name" => $request->name,
             "description" => $request->description,

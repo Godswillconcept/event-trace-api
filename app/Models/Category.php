@@ -12,7 +12,7 @@ class Category extends Model
 {
     use HasFactory, HasApiTokens;
 
-    protected $fillable = ['name', 'slug', 'description'];
+    protected $fillable = ['name', 'slug', 'description', 'user_id'];
 
     public function events()
     {

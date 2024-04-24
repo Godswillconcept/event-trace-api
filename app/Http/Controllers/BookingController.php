@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Event;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class BookingController extends Controller
 {
@@ -13,6 +15,7 @@ class BookingController extends Controller
     {
         $bookings = Booking::orderBy("created_at", "desc")->get();
         return response([
+            "message" => "Bookings fetched successfully",
             "bookings" => $bookings
         ], 200);
     }
@@ -24,22 +27,24 @@ class BookingController extends Controller
             "event_id" => "numeric",
             'ticket_id' => "numeric",
             "quantity" => "numeric",
-            'description' => "string",
-            "price" => "numeric",
+            'description' => "string||nullable",
+            "price" => "numeric||nullable",
         ]);
 
-        // dd($request->all());
-
         $user = Auth::user();
-
-        $booking = Booking::create([
+        $bookingPrice = Ticket::find($request->ticket_id)->price * $request->quantity;
+        $bookingDescription =  $user->name . " has " . $request->quantity . " " . Str::plural('booking', $request->quantity) . " for the " . Event::find($request->event_id)->name . " at " . Ticket::find($request->ticket_id)->price * $request->quantity;
+        $booking = new Booking([
             "event_id" => $request->event_id,
             "user_id" => $user->id,
             "ticket_id" => $request->ticket_id,
             "quantity" => $request->quantity,
-            "description" => $request->description,
-            "price" => $request->price,
+            "description" => $bookingDescription,
+            "price" => $bookingPrice,
+
         ]);
+
+        $booking->save();
         return response([
             "message" => "Booking created successfully", "booking" => $booking,
         ], 200);

@@ -77,7 +77,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // tickets 
     Route::get('/tickets', [TicketController::class, 'index']);
     Route::get('/tickets/{id}', [TicketController::class, 'show']);
-    Route::get('/tickets', [TicketController::class, 'index'])->middleware('isEventOrganizer');
     Route::post('/tickets', [TicketController::class, 'store'])->middleware('isEventOrganizer');
     Route::put('/tickets/{id}', [TicketController::class, 'update'])->middleware('isEventOrganizer');
     Route::delete('/tickets/{id}', [TicketController::class, 'destroy'])->middleware('isEventOrganizer');
@@ -97,34 +96,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('categories', [CategoryController::class, 'index']);
     Route::get('categories/{slug}', [CategoryController::class, 'show']);
 
-    // admin routes extensions 
-    Route::prefix('admin')->group(function () {
-        // users
-        Route::post('logout', [AuthController::class, 'logout']);
-        Route::get('user', [AuthController::class, 'user']);
-        Route::get('users', [AuthController::class, 'index']);
-        Route::put('users/{slug}', [AuthController::class, 'update']);
-        Route::post('users/{slug}/image', [AuthController::class, 'uploadImage']);
-        Route::delete('user/{slug}', [AuthController::class, 'destroy']);
-        // categories
-        Route::get('categories', [CategoryController::class, 'index'])->middleware('isAdmin');
-        Route::post('categories', [CategoryController::class, 'store'])->middleware('isAdmin');
-        Route::get('categories/{slug}', [CategoryController::class, 'show'])->middleware('isAdmin');
-        Route::put('categories/{slug}', [CategoryController::class, 'update'])->middleware('isAdmin');
-        Route::delete('categories/{slug}', [CategoryController::class, 'destroy'])->middleware('isAdmin');
-        // events
-        Route::get('events', [EventController::class, 'index']);
-        Route::get('events/{slug}', [EventController::class, 'show']);
-        Route::get('events/{slug}/tickets', [EventController::class, 'tickets']);
-        Route::get('events/{slug}/faqs', [EventController::class, 'faqs']);
-        // faqs 
-        Route::get('faqs', [FaqController::class, 'index']);
-        // venues 
-        Route::get('venues', [VenueController::class, 'index']);
-        Route::get('venues/{slug}', [VenueController::class, 'show']);
-        Route::get('venues/{slug}/events', [VenueController::class, 'events']);
-        // tickets 
-        Route::get('tickets', [TicketController::class, 'index']);
-        Route::get('tickets/{id}', [TicketController::class, 'show']);
-    });
+    // admin routes extensions
+
+    // categories
+    Route::post('categories', [CategoryController::class, 'store'])->middleware('isAdmin');
+    Route::put('categories/{slug}', [CategoryController::class, 'update'])->middleware('isAdmin');
+    Route::delete('categories/{slug}', [CategoryController::class, 'destroy'])->middleware('isAdmin');
 });

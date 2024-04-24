@@ -33,7 +33,7 @@ class VenueController extends Controller
                 "message" => "Unauthorized",
             ], 401);
         }
-
+        // dd($request->all());
         $venue = Venue::create([
             "name" => $request->name,
             "address" => $request->address,
@@ -92,20 +92,18 @@ class VenueController extends Controller
             'photos.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        // dd($request->all());
-        if ($request->hasFile('photo')) {
-            
+        
+        if ($request->hasFile('photos')) {
             $imagePaths = [];
-            foreach ($request->file('photo') as $key => $photo) {
+            foreach ($request->file('photos') as $key => $photo) {
                 $imagePath = $this->saveImage($photo, 'venues');
                 $imagePaths[] = $imagePath;
             }
-
-            $venue->photos = $imagePaths;
-            // dd($venue->photos);
-            $venue->save();
+            // dd($imagePaths);
+            $venue->update([
+                "photos" => $imagePaths,
+            ]);
         }
-
         return response([
             'message' => 'Images uploaded successfully',
         ], 200);

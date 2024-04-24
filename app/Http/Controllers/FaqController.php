@@ -28,9 +28,7 @@ class FaqController extends Controller
             "answers" => "required|array",
             "answers.*" => "required|string",
         ]);
-
-
-  
+        // dd($request->all());
 
         $event = Event::where('slug', $slug)->first();
         if (!$event) {

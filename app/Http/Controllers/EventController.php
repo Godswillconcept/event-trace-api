@@ -27,7 +27,6 @@ class EventController extends Controller
             "category_id" => "numeric",
             "venue_id" => "numeric",
         ]);
-
         $currentUser = Auth::user();
         if ($currentUser->role === 'event_organizer') {
             $event = Event::create([
@@ -65,8 +64,6 @@ class EventController extends Controller
 
     public function update(Request $request, $slug)
     {
-
-
         $event = Event::where("slug", $slug)->first();
         if (!$event) {
             return response([
@@ -145,7 +142,6 @@ class EventController extends Controller
 
     public function attachPhotos(Request $request, $slug)
     {
-
         $request->validate([
             'photos.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
@@ -157,13 +153,13 @@ class EventController extends Controller
                 "message" => "Event not found",
             ], 404);
         }
-
         if ($request->hasFile('photos')) {
             $imagePaths = [];
             foreach ($request->file('photos') as $key => $photo) {
                 $imagePath = $this->saveImage($photo, 'events');
                 $imagePaths[] = $imagePath;
             }
+            // dd($imagePaths);
             $event->update([
                 "photos" => $imagePaths,
             ]);
