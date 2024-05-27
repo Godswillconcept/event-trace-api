@@ -13,7 +13,7 @@ class PromotionController extends Controller
         $promotions = Promotion::orderBy('created_at', 'desc')->get();
         return response([
             'message' => 'Promotions fetched successfully',
-            'promotions' => $promotions
+            'promotions' => $promotions->load('user', 'event'),
         ], 200);
     }
 
