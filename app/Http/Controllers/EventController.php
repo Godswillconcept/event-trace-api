@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Faq;
+use App\Models\Promotion;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -155,7 +158,7 @@ class EventController extends Controller
             ], 404);
         }
 
-        dd($request->file('photos'));
+        // dd($request->file('photos'));
         if ($request->hasFile('photos')) {
             $imagePaths = [];
             foreach ($request->file('photos') as $key => $photo) {
@@ -168,6 +171,98 @@ class EventController extends Controller
         }
         return response([
             "message" => "Event Images uploaded successfully", "event" => $event,
+        ], 200);
+    }
+    public function attachTickets(Request $request, $slug)
+    {
+        $request->validate([
+            "name" => "required",
+            "description" => "required",
+            "quantity" => "numeric||nullable",
+            "price" => "required||nullable",
+            "sales_start" => "required||nullable",
+            "sales_end" => "required||nullable",
+        ]);
+        $event = Event::where("slug", $slug)->first();
+
+        if (!$event) {
+            return response([
+                "message" => "Event not found",
+            ], 404);
+        }
+        // dd($request->all());
+
+        $ticket = Ticket::create([
+            "name" => $request->name,
+            "description" => $request->description,
+            "event_id" => $event->id,
+            "quantity" => $request->quantity,
+            "price" => $request->price,
+            "sales_start" => $request->sales_start,
+            "sales_end" => $request->sales_end,
+        ]);
+
+
+
+        return response([
+            "message" => "Event Tickets uploaded successfully", "ticket" => $ticket,
+        ], 200);
+    }
+
+    public function attachFaqs(Request $request, $slug)
+    {
+
+        $request->validate([
+            "questions" => "required|array",
+            "questions.*" => "required|string",
+            "answers" => "required|array",
+            "answers.*" => "required|string",
+        ]);
+        // dd($request->all());
+
+        $event = Event::where('slug', $slug)->first();
+        if (!$event) {
+            return response([
+                'message' => 'No event found',
+            ]);
+        }
+
+        $faq = Faq::create([
+            "event_id" => $event->id,
+            "questions" => $request->questions,
+            "answers" => $request->answers,
+        ]);
+
+        return response([
+            "message" => "FAQ added to event successfully",
+            "faq" => $faq
+        ], 200);
+    }
+
+    public function attachPromotions(Request $request, $slug)
+    {
+        $request->validate([
+            "platform" => "in:social_media,email,referral,others",
+        ]);
+        $user = Auth::user();
+
+        $event = Event::where('slug', $slug)->first();
+        if (!$event) {
+            return response([
+                'message' => 'No event found',
+            ]);
+        }
+
+        // dd($request->all());
+        $promotion = Promotion::create([
+            "event_id" => $event->id,
+            "platform" => $request->platform,
+            "user_id" => $user->id
+        ]);
+
+        return response([
+            'message' => 'Promotion created successfully',
+            'promotion' => $promotion
         ], 200);
     }
 }

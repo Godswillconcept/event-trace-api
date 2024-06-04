@@ -13,9 +13,10 @@ class Ticket extends Model
 
     protected $fillable = ['name', 'description', 'event_id', 'price', 'quantity', 'sales_start', 'sales_end',];
 
-    public function events()
+
+    public function event()
     {
-        return $this->belongsToMany(Event::class, 'event_tickets', 'ticket_id', 'event_id');
+        return $this->belongsTo(Event::class, 'event_id', '');
     }
 
     public function bookings()

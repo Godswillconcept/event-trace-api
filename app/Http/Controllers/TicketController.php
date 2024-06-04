@@ -13,42 +13,7 @@ class TicketController extends Controller
         $tickets = Ticket::orderBy("created_at", "desc")->get();
         return response([
             "message" => "Tickets fetched successfully",
-            "tickets" => $tickets
-        ], 200);
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            "name" => "required",
-            "description" => "required",
-            "event_id" => "required",
-            "quantity" => "numeric||nullable",
-            "price" => "required||nullable",
-            "sales_start" => "required||nullable",
-            "sales_end" => "required||nullable",
-        ]);
-
-        $user = Auth::user();
-
-        if ($user->role != 'event_organizer') {
-            return response([
-                'message' => 'No event organizer found',
-            ]);
-        }
-        // dd($request->all());
-        $ticket = Ticket::create([
-            "name" => $request->name,
-            "description" => $request->description,
-            "event_id" => $request->event_id,
-            "quantity" => $request->quantity,
-            "price" => $request->price,
-            "sales_start" => $request->sales_start,
-            "sales_end" => $request->sales_end,
-        ]);
-        return response([
-            "message" => "Ticket created successfully",
-            "ticket" => $ticket
+            "tickets" => $tickets->load('event')
         ], 200);
     }
 
