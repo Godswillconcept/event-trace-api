@@ -13,7 +13,7 @@ class VenueController extends Controller
         $venues = Venue::latest()->get();
         return response([
             'message' => 'Venues fetched successfully',
-            "venues" => $venues->load('owner', 'events'),
+            "venues" => $venues->load('owner', 'events',),
         ], 200);
     }
 
@@ -86,28 +86,31 @@ class VenueController extends Controller
 
     public function attachPhotos(Request $request, $slug)
     {
-        $venue = Venue::where('slug', $slug)->first();
-
         $request->validate([
             'photos.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-
-        
+        $venue = Venue::where("slug", $slug)->first();
+    
+        if (!$venue) {
+            return response([
+                "message" => "Venue not found",
+            ], 404);
+        }
         if ($request->hasFile('photos')) {
             $imagePaths = [];
             foreach ($request->file('photos') as $key => $photo) {
                 $imagePath = $this->saveImage($photo, 'venues');
                 $imagePaths[] = $imagePath;
             }
-            // dd($imagePaths);
             $venue->update([
                 "photos" => $imagePaths,
             ]);
         }
         return response([
-            'message' => 'Images uploaded successfully',
+            "message" => "Venue Images uploaded successfully", "venue" => $venue,
         ], 200);
     }
+    
 
     public function update(Request $request, $slug)
     {
@@ -129,8 +132,6 @@ class VenueController extends Controller
             'message' => 'Venue updated successfully',
         ], 200);
     }
-
-
 
     public function events($slug)
     {

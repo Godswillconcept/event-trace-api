@@ -149,7 +149,6 @@ class EventController extends Controller
         $request->validate([
             'photos.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
-
         $event = Event::where("slug", $slug)->first();
 
         if (!$event) {
@@ -157,8 +156,6 @@ class EventController extends Controller
                 "message" => "Event not found",
             ], 404);
         }
-
-        // dd($request->file('photos'));
         if ($request->hasFile('photos')) {
             $imagePaths = [];
             foreach ($request->file('photos') as $key => $photo) {
@@ -173,6 +170,8 @@ class EventController extends Controller
             "message" => "Event Images uploaded successfully", "event" => $event,
         ], 200);
     }
+
+
     public function attachTickets(Request $request, $slug)
     {
         $request->validate([
